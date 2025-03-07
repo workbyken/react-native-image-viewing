@@ -7,22 +7,19 @@
  */
 
 import React, { useCallback, useRef, useState } from "react";
+import PropTypes from 'prop-types';
 
 import {
   Animated,
   ScrollView,
   Dimensions,
   StyleSheet,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  NativeMethodsMixin,
 } from "react-native";
 
 import useImageDimensions from "../../hooks/useImageDimensions";
 import usePanResponder from "../../hooks/usePanResponder";
 
 import { getImageStyles, getImageTransform } from "../../utils";
-import { ImageSource } from "../../@types";
 import { ImageLoading } from "./ImageLoading";
 
 const SWIPE_CLOSE_OFFSET = 75;
@@ -30,16 +27,6 @@ const SWIPE_CLOSE_VELOCITY = 1.75;
 const SCREEN = Dimensions.get("window");
 const SCREEN_WIDTH = SCREEN.width;
 const SCREEN_HEIGHT = SCREEN.height;
-
-type Props = {
-  imageSrc: ImageSource;
-  onRequestClose: () => void;
-  onZoom: (isZoomed: boolean) => void;
-  onLongPress: (image: ImageSource) => void;
-  delayLongPress: number;
-  swipeToCloseEnabled?: boolean;
-  doubleTapToZoomEnabled?: boolean;
-};
 
 const ImageItem = ({
   imageSrc,
@@ -49,8 +36,8 @@ const ImageItem = ({
   delayLongPress,
   swipeToCloseEnabled = true,
   doubleTapToZoomEnabled = true,
-}: Props) => {
-  const imageContainer = useRef<ScrollView & NativeMethodsMixin>(null);
+}) => {
+  const imageContainer = useRef(null);
   const imageDimensions = useImageDimensions(imageSrc);
   const [translate, scale] = getImageTransform(imageDimensions, SCREEN);
   const scrollValueY = new Animated.Value(0);
@@ -58,7 +45,7 @@ const ImageItem = ({
 
   const onLoaded = useCallback(() => setLoadEnd(true), []);
   const onZoomPerformed = useCallback(
-    (isZoomed: boolean) => {
+    (isZoomed) => {
       onZoom(isZoomed);
       if (imageContainer?.current) {
         imageContainer.current.setNativeProps({
@@ -93,9 +80,7 @@ const ImageItem = ({
   });
   const imageStylesWithOpacity = { ...imagesStyles, opacity: imageOpacity };
 
-  const onScrollEndDrag = ({
-    nativeEvent,
-  }: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const onScrollEndDrag = ({ nativeEvent }) => {
     const velocityY = nativeEvent?.velocity?.y ?? 0;
     const offsetY = nativeEvent?.contentOffset?.y ?? 0;
 
@@ -108,11 +93,8 @@ const ImageItem = ({
     }
   };
 
-  const onScroll = ({
-    nativeEvent,
-  }: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const onScroll = ({ nativeEvent }) => {
     const offsetY = nativeEvent?.contentOffset?.y ?? 0;
-
     scrollValueY.setValue(offsetY);
   };
 
@@ -142,6 +124,22 @@ const ImageItem = ({
   );
 };
 
+ImageItem.propTypes = {
+  imageSrc: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.shape({
+      uri: PropTypes.string.isRequired,
+      headers: PropTypes.object
+    })
+  ]).isRequired,
+  onRequestClose: PropTypes.func.isRequired,
+  onZoom: PropTypes.func.isRequired,
+  onLongPress: PropTypes.func.isRequired,
+  delayLongPress: PropTypes.number.isRequired,
+  swipeToCloseEnabled: PropTypes.bool,
+  doubleTapToZoomEnabled: PropTypes.bool
+};
+
 const styles = StyleSheet.create({
   listItem: {
     width: SCREEN_WIDTH,
@@ -152,4 +150,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(ImageItem);
+export default React.memo(ImageItem); 

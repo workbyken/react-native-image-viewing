@@ -6,14 +6,13 @@
  *
  */
 
-import React, { ComponentType, useCallback, useRef, useEffect } from "react";
+import React, { useCallback, useRef, useEffect } from "react";
 import {
   Animated,
   Dimensions,
   StyleSheet,
   View,
   VirtualizedList,
-  ModalProps,
   Modal,
 } from "react-native";
 
@@ -24,25 +23,6 @@ import StatusBarManager from "./components/StatusBarManager";
 import useAnimatedComponents from "./hooks/useAnimatedComponents";
 import useImageIndexChange from "./hooks/useImageIndexChange";
 import useRequestClose from "./hooks/useRequestClose";
-import { ImageSource } from "./@types";
-
-type Props = {
-  images: ImageSource[];
-  keyExtractor?: (imageSrc: ImageSource, index: number) => string;
-  imageIndex: number;
-  visible: boolean;
-  onRequestClose: () => void;
-  onLongPress?: (image: ImageSource) => void;
-  onImageIndexChange?: (imageIndex: number) => void;
-  presentationStyle?: ModalProps["presentationStyle"];
-  animationType?: ModalProps["animationType"];
-  backgroundColor?: string;
-  swipeToCloseEnabled?: boolean;
-  doubleTapToZoomEnabled?: boolean;
-  delayLongPress?: number;
-  HeaderComponent?: ComponentType<{ imageIndex: number }>;
-  FooterComponent?: ComponentType<{ imageIndex: number }>;
-};
 
 const DEFAULT_ANIMATION_TYPE = "fade";
 const DEFAULT_BG_COLOR = "#000";
@@ -66,8 +46,8 @@ function ImageViewing({
   delayLongPress = DEFAULT_DELAY_LONG_PRESS,
   HeaderComponent,
   FooterComponent,
-}: Props) {
-  const imageList = useRef<VirtualizedList<ImageSource>>(null);
+}) {
+  const imageList = useRef(null);
   const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
   const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, SCREEN);
   const [headerTransform, footerTransform, toggleBarsVisible] =
@@ -80,8 +60,7 @@ function ImageViewing({
   }, [currentImageIndex]);
 
   const onZoom = useCallback(
-    (isScaled: boolean) => {
-      // @ts-ignore
+    (isScaled) => {
       imageList?.current?.setNativeProps({ scrollEnabled: !isScaled });
       toggleBarsVisible(!isScaled);
     },
@@ -143,7 +122,6 @@ function ImageViewing({
             />
           )}
           onMomentumScrollEnd={onScroll}
-          //@ts-ignore
           keyExtractor={(imageSrc, index) =>
             keyExtractor
               ? keyExtractor(imageSrc, index)
@@ -185,8 +163,8 @@ const styles = StyleSheet.create({
   },
 });
 
-const EnhancedImageViewing = (props: Props) => (
+const EnhancedImageViewing = (props) => (
   <ImageViewing key={props.imageIndex} {...props} />
 );
 
-export default EnhancedImageViewing;
+export default EnhancedImageViewing; 

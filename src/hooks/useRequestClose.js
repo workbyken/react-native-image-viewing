@@ -8,7 +8,7 @@
 
 import { useState } from "react";
 
-const useRequestClose = (onRequestClose: () => void) => {
+const useRequestClose = (onRequestClose) => {
   const [opacity, setOpacity] = useState(1);
 
   return [
@@ -18,7 +18,7 @@ const useRequestClose = (onRequestClose: () => void) => {
       onRequestClose();
       setTimeout(() => setOpacity(1), 0);
     },
-  ] as const;
+  ];
 };
 
-export default useRequestClose;
+export default useRequestClose; 

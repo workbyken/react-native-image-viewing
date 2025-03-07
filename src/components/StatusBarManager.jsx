@@ -1,15 +1,7 @@
 import { useEffect } from "react";
-import {
-  Platform,
-  ModalProps,
-  StatusBar,
-} from "react-native";
+import { Platform, StatusBar } from "react-native";
 
-const StatusBarManager = ({
-  presentationStyle,
-}: {
-  presentationStyle?: ModalProps["presentationStyle"];
-}) => {
+const StatusBarManager = ({ presentationStyle }) => {
   if (Platform.OS === "ios" || presentationStyle !== "overFullScreen") {
     return null;
   }
@@ -24,4 +16,4 @@ const StatusBarManager = ({
   return null;
 };
 
-export default StatusBarManager;
+export default StatusBarManager; 

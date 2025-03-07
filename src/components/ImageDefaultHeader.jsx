@@ -9,13 +9,9 @@
 import React from "react";
 import { SafeAreaView, Text, TouchableOpacity, StyleSheet } from "react-native";
 
-type Props = {
-  onRequestClose: () => void;
-};
-
 const HIT_SLOP = { top: 16, left: 16, bottom: 16, right: 16 };
 
-const ImageDefaultHeader = ({ onRequestClose }: Props) => (
+const ImageDefaultHeader = ({ onRequestClose }) => (
   <SafeAreaView style={styles.root}>
     <TouchableOpacity
       style={styles.closeButton}
@@ -50,4 +46,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ImageDefaultHeader;
+export default ImageDefaultHeader; 
