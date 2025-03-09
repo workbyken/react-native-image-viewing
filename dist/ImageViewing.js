@@ -27,18 +27,26 @@ const isVideoSource = (source) => {
     
     // Check if it's a local resource with a video extension
     if (typeof source === 'number') {
-        return false; // Local resources are typically images
+        // Local resources are typically images in React Native
+        // We can't easily determine if a local resource is a video
+        return false;
     }
     
     // Check if it's a remote URL with a video extension
     if (source.uri) {
         const uri = source.uri.toLowerCase();
-        return uri.endsWith('.mp4') || 
-               uri.endsWith('.mov') || 
-               uri.endsWith('.avi') || 
-               uri.endsWith('.mkv') ||
-               uri.endsWith('.webm') ||
-               uri.includes('video/');
+        
+        // Check for common video file extensions
+        const videoExtensions = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.3gp', '.flv', '.m4v'];
+        const hasVideoExtension = videoExtensions.some(ext => uri.endsWith(ext));
+        
+        // Check for video MIME types in the URI
+        const hasVideoMimeType = uri.includes('video/');
+        
+        // Check if the source explicitly specifies it's a video
+        const isExplicitlyVideo = source.type === 'video';
+        
+        return hasVideoExtension || hasVideoMimeType || isExplicitlyVideo;
     }
     
     return false;
@@ -105,24 +113,31 @@ function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClos
                         offset: SCREEN_WIDTH * index,
                         index,
                     })} 
-                    renderItem={({ item: mediaSrc }) => (
-                        isVideoSource(mediaSrc) ? (
-                            <VideoItem 
-                                videoSrc={mediaSrc} 
-                                onRequestClose={onRequestCloseEnhanced}
-                            />
-                        ) : (
-                            <ImageItem 
-                                onZoom={onZoom} 
-                                imageSrc={mediaSrc} 
-                                onRequestClose={onRequestCloseEnhanced} 
-                                onLongPress={onLongPress} 
-                                delayLongPress={delayLongPress} 
-                                swipeToCloseEnabled={swipeToCloseEnabled} 
-                                doubleTapToZoomEnabled={doubleTapToZoomEnabled}
-                            />
-                        )
-                    )} 
+                    renderItem={({ item: mediaSrc }) => {
+                        const isVideo = isVideoSource(mediaSrc);
+                        console.log('Rendering media source:', mediaSrc, 'isVideo:', isVideo);
+                        
+                        if (isVideo) {
+                            return (
+                                <VideoItem 
+                                    videoSrc={mediaSrc} 
+                                    onRequestClose={onRequestCloseEnhanced}
+                                />
+                            );
+                        } else {
+                            return (
+                                <ImageItem 
+                                    onZoom={onZoom} 
+                                    imageSrc={mediaSrc} 
+                                    onRequestClose={onRequestCloseEnhanced} 
+                                    onLongPress={onLongPress} 
+                                    delayLongPress={delayLongPress} 
+                                    swipeToCloseEnabled={swipeToCloseEnabled} 
+                                    doubleTapToZoomEnabled={doubleTapToZoomEnabled}
+                                />
+                            );
+                        }
+                    }} 
                     onMomentumScrollEnd={onScroll} 
                     keyExtractor={(mediaSrc, index) => keyExtractor
                         ? keyExtractor(mediaSrc, index)

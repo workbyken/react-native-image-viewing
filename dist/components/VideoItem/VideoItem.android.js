@@ -9,6 +9,7 @@ import React, { useCallback, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import { Video } from "expo-av";
 import { ImageLoading } from "../ImageItem/ImageLoading";
+import useVideoDimensions from "../../hooks/useVideoDimensions";
 
 const SCREEN = Dimensions.get("window");
 const SCREEN_WIDTH = SCREEN.width;
@@ -16,6 +17,7 @@ const SCREEN_HEIGHT = SCREEN.height;
 
 const VideoItem = ({ videoSrc, onRequestClose }) => {
   const [loaded, setLoaded] = useState(false);
+  const videoDimensions = useVideoDimensions(videoSrc);
 
   const onLoadEnd = useCallback(() => {
     setLoaded(true);
@@ -26,12 +28,15 @@ const VideoItem = ({ videoSrc, onRequestClose }) => {
       {!loaded && <ImageLoading />}
       <Video
         source={videoSrc}
-        style={styles.video}
+        style={[styles.video, { width: videoDimensions.width, height: videoDimensions.height }]}
         resizeMode="contain"
         shouldPlay
         useNativeControls
-        onLoad={onLoadEnd}
-        onError={() => console.error("Error loading video")}
+        onReadyForDisplay={onLoadEnd}
+        onError={(error) => {
+          console.error("Error loading video:", error);
+          setLoaded(true); // Set loaded to true even on error to hide loading indicator
+        }}
       />
     </View>
   );

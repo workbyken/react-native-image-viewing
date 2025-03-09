@@ -17,10 +17,14 @@ const SCREEN = Dimensions.get("screen");
 const SCREEN_WIDTH = SCREEN.width;
 const SCREEN_HEIGHT = SCREEN.height;
 const ImageItem = ({ imageSrc, onZoom, onRequestClose, onLongPress, delayLongPress, swipeToCloseEnabled = true, doubleTapToZoomEnabled = true, }) => {
+    console.log('ImageItem received imageSrc:', imageSrc);
+    
     const scrollViewRef = useRef(null);
     const [loaded, setLoaded] = useState(false);
     const [scaled, setScaled] = useState(false);
     const imageDimensions = useImageDimensions(imageSrc);
+    console.log('ImageItem dimensions:', imageDimensions);
+    
     const handleDoubleTap = useDoubleTapToZoom(scrollViewRef, scaled, SCREEN);
     const [translate, scale] = getImageTransform(imageDimensions, SCREEN);
     const scrollValueY = new Animated.Value(0);
