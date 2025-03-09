@@ -3,7 +3,6 @@
   "version": "0.2.2",
   "description": "React Native modal component for viewing images as a sliding gallery",
   "main": "index.js",
-  "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/workbyken/react-native-image-viewing.git"
@@ -17,15 +16,17 @@
     "image-viewer"
   ],
   "scripts": {
-    "build": "tsc",
-    "postversion": "yarn build"
+    "build": "echo 'No build step required'"
   },
   "peerDependencies": {
     "react": ">=16.11.0",
     "react-native": ">=0.61.3"
   },
   "files": [
-    "dist",
+    "*.js",
+    "*.jsx",
+    "components",
+    "hooks",
     "readme.md",
     "package.json"
   ],
@@ -37,15 +38,12 @@
   "homepage": "https://github.com/workbyken/react-native-image-viewing#readme",
   "devDependencies": {
     "@babel/runtime": "7.7.4",
-    "@types/react": "16.9.13",
-    "@types/react-native": "0.60.23",
     "react": "16.12.0",
-    "react-native": "0.61.5",
-    "typescript": "3.7.2"
+    "react-native": "0.61.5"
   },
   "metro": {
     "resolver": {
-      "sourceExts": ["js", "jsx", "ts", "tsx", "json"]
+      "sourceExts": ["js", "jsx", "json"]
     }
   }
 }

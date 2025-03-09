@@ -6,4 +6,5 @@
  *
  */
 
-export { default } from "./ImageViewing.jsx"; 
+import ImageViewing from './ImageViewing.jsx';
+export default ImageViewing; 
