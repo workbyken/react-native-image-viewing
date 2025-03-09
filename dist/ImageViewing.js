@@ -8,6 +8,7 @@
 import React, { useCallback, useRef, useEffect } from "react";
 import { Animated, Dimensions, StyleSheet, View, VirtualizedList, Modal } from "react-native";
 import ImageItem from "./components/ImageItem/ImageItem";
+import VideoItem from "./components/VideoItem";
 import ImageDefaultHeader from "./components/ImageDefaultHeader";
 import StatusBarManager from "./components/StatusBarManager";
 import useAnimatedComponents from "./hooks/useAnimatedComponents";
@@ -19,6 +20,29 @@ const DEFAULT_BG_COLOR = "#000";
 const DEFAULT_DELAY_LONG_PRESS = 800;
 const SCREEN = Dimensions.get("screen");
 const SCREEN_WIDTH = SCREEN.width;
+
+// Helper function to determine if the source is a video
+const isVideoSource = (source) => {
+    if (!source) return false;
+    
+    // Check if it's a local resource with a video extension
+    if (typeof source === 'number') {
+        return false; // Local resources are typically images
+    }
+    
+    // Check if it's a remote URL with a video extension
+    if (source.uri) {
+        const uri = source.uri.toLowerCase();
+        return uri.endsWith('.mp4') || 
+               uri.endsWith('.mov') || 
+               uri.endsWith('.avi') || 
+               uri.endsWith('.mkv') ||
+               uri.endsWith('.webm') ||
+               uri.includes('video/');
+    }
+    
+    return false;
+};
 
 function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClose, onLongPress = () => { }, onImageIndexChange, animationType = DEFAULT_ANIMATION_TYPE, backgroundColor = DEFAULT_BG_COLOR, presentationStyle, swipeToCloseEnabled, doubleTapToZoomEnabled, delayLongPress = DEFAULT_DELAY_LONG_PRESS, HeaderComponent, FooterComponent }) {
     const imageList = useRef(null);
@@ -81,23 +105,30 @@ function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClos
                         offset: SCREEN_WIDTH * index,
                         index,
                     })} 
-                    renderItem={({ item: imageSrc }) => (
-                        <ImageItem 
-                            onZoom={onZoom} 
-                            imageSrc={imageSrc} 
-                            onRequestClose={onRequestCloseEnhanced} 
-                            onLongPress={onLongPress} 
-                            delayLongPress={delayLongPress} 
-                            swipeToCloseEnabled={swipeToCloseEnabled} 
-                            doubleTapToZoomEnabled={doubleTapToZoomEnabled}
-                        />
+                    renderItem={({ item: mediaSrc }) => (
+                        isVideoSource(mediaSrc) ? (
+                            <VideoItem 
+                                videoSrc={mediaSrc} 
+                                onRequestClose={onRequestCloseEnhanced}
+                            />
+                        ) : (
+                            <ImageItem 
+                                onZoom={onZoom} 
+                                imageSrc={mediaSrc} 
+                                onRequestClose={onRequestCloseEnhanced} 
+                                onLongPress={onLongPress} 
+                                delayLongPress={delayLongPress} 
+                                swipeToCloseEnabled={swipeToCloseEnabled} 
+                                doubleTapToZoomEnabled={doubleTapToZoomEnabled}
+                            />
+                        )
                     )} 
                     onMomentumScrollEnd={onScroll} 
-                    keyExtractor={(imageSrc, index) => keyExtractor
-                        ? keyExtractor(imageSrc, index)
-                        : typeof imageSrc === "number"
-                            ? `${imageSrc}`
-                            : imageSrc.uri
+                    keyExtractor={(mediaSrc, index) => keyExtractor
+                        ? keyExtractor(mediaSrc, index)
+                        : typeof mediaSrc === "number"
+                            ? `${mediaSrc}`
+                            : mediaSrc.uri
                     }
                 />
                 {typeof FooterComponent !== "undefined" && (
