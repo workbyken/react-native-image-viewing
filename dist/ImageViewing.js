@@ -113,15 +113,17 @@ function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClos
                         offset: SCREEN_WIDTH * index,
                         index,
                     })} 
-                    renderItem={({ item: mediaSrc }) => {
+                    renderItem={({ item: mediaSrc, index }) => {
                         const isVideo = isVideoSource(mediaSrc);
-                        console.log('Rendering media source:', mediaSrc, 'isVideo:', isVideo);
+                        const isActive = index === currentImageIndex;
+                        console.log('Rendering media source:', mediaSrc, 'isVideo:', isVideo, 'isActive:', isActive);
                         
                         if (isVideo) {
                             return (
                                 <VideoItem 
                                     videoSrc={mediaSrc} 
                                     onRequestClose={onRequestCloseEnhanced}
+                                    isActive={isActive}
                                 />
                             );
                         } else {
