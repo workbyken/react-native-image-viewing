@@ -5,9 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import React, { useCallback, useState, useRef, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
-import { Video } from "expo-av";
+import { useVideoPlayer, VideoView } from "expo-video";
 import { ImageLoading } from "../ImageItem/ImageLoading";
 import useVideoDimensions from "../../hooks/useVideoDimensions";
 
@@ -18,7 +18,12 @@ const SCREEN_HEIGHT = SCREEN.height;
 const VideoItem = ({ videoSrc, onRequestClose, isActive }) => {
   const [loaded, setLoaded] = useState(false);
   const videoDimensions = useVideoDimensions(videoSrc);
-  const videoRef = useRef(null);
+  
+  // Create video player using the new expo-video API
+  const player = useVideoPlayer(videoSrc, (player) => {
+    player.loop = false;
+    player.muted = false;
+  });
 
   const onLoadEnd = useCallback(() => {
     setLoaded(true);
@@ -26,24 +31,24 @@ const VideoItem = ({ videoSrc, onRequestClose, isActive }) => {
 
   // Effect to pause video when component becomes inactive (swiped away)
   useEffect(() => {
-    if (videoRef.current) {
+    if (player) {
       if (!isActive) {
-        videoRef.current.pauseAsync();
+        player.pause();
       }
     }
-  }, [isActive]);
+  }, [isActive, player]);
 
   return (
     <View style={styles.container}>
       {!loaded && <ImageLoading />}
-      <Video
-        ref={videoRef}
-        source={videoSrc}
+      <VideoView
+        player={player}
         style={[styles.video, { width: videoDimensions.width, height: videoDimensions.height }]}
-        resizeMode="contain"
-        useNativeControls
-        shouldPlay={false}
-        onReadyForDisplay={onLoadEnd}
+        contentFit="contain"
+        nativeControls={true}
+        allowsFullscreen={true}
+        allowsPictureInPicture={true}
+        onFirstFrameRender={onLoadEnd}
         onError={(error) => {
           console.error("Error loading video:", error);
           setLoaded(true); // Set loaded to true even on error to hide loading indicator

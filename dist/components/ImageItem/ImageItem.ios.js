@@ -16,7 +16,7 @@ const SWIPE_CLOSE_VELOCITY = 1.55;
 const SCREEN = Dimensions.get("screen");
 const SCREEN_WIDTH = SCREEN.width;
 const SCREEN_HEIGHT = SCREEN.height;
-const ImageItem = ({ imageSrc, onZoom, onRequestClose, onLongPress, delayLongPress, swipeToCloseEnabled = true, doubleTapToZoomEnabled = true, }) => {
+const ImageItem = ({ imageSrc, onZoom, onRequestClose, onLongPress, onPress, delayLongPress, swipeToCloseEnabled = true, doubleTapToZoomEnabled = true, }) => {
     console.log('ImageItem received imageSrc:', imageSrc);
     
     const scrollViewRef = useRef(null);
@@ -65,7 +65,7 @@ const ImageItem = ({ imageSrc, onZoom, onRequestClose, onLongPress, delayLongPre
         onScroll,
     })}>
         {(!loaded || !imageDimensions) && <ImageLoading />}
-        <TouchableWithoutFeedback onPress={doubleTapToZoomEnabled ? handleDoubleTap : undefined} onLongPress={onLongPressHandler} delayLongPress={delayLongPress}>
+        <TouchableWithoutFeedback onPress={doubleTapToZoomEnabled ? handleDoubleTap : (onPress ? () => onPress(imageSrc) : undefined)} onLongPress={onLongPressHandler} delayLongPress={delayLongPress}>
           <Animated.Image source={imageSrc} style={imageStylesWithOpacity} onLoad={() => setLoaded(true)}/>
         </TouchableWithoutFeedback>
       </ScrollView>

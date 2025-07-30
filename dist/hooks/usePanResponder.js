@@ -15,7 +15,7 @@ const MIN_DIMENSION = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT);
 const SCALE_MAX = 2;
 const DOUBLE_TAP_DELAY = 300;
 const OUT_BOUND_MULTIPLIER = 0.75;
-const usePanResponder = ({ initialScale, initialTranslate, onZoom, doubleTapToZoomEnabled, onLongPress, delayLongPress, }) => {
+const usePanResponder = ({ initialScale, initialTranslate, onZoom, doubleTapToZoomEnabled, onLongPress, onPress, delayLongPress, }) => {
     let numberInitialTouches = 1;
     let initialTouches = [];
     let currentScale = initialScale;
@@ -212,8 +212,19 @@ const usePanResponder = ({ initialScale, initialTranslate, onZoom, doubleTapToZo
                 tmpTranslate = { x: nextTranslateX, y: nextTranslateY };
             }
         },
-        onRelease: () => {
+        onRelease: (event, gestureState) => {
             cancelLongPressHandle();
+            
+            // Handle single tap for onPress if not a double tap and minimal movement
+            const isTapGesture = numberInitialTouches === 1 && 
+                Math.abs(gestureState.dx) < meaningfulShift && 
+                Math.abs(gestureState.dy) < meaningfulShift;
+            
+            if (isTapGesture && !isDoubleTapPerformed && onPress && currentScale === initialScale) {
+                // Only trigger onPress for single taps when not zoomed
+                onPress();
+            }
+            
             if (isDoubleTapPerformed) {
                 isDoubleTapPerformed = false;
             }

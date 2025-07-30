@@ -16,7 +16,7 @@ const SWIPE_CLOSE_VELOCITY = 1.75;
 const SCREEN = Dimensions.get("window");
 const SCREEN_WIDTH = SCREEN.width;
 const SCREEN_HEIGHT = SCREEN.height;
-const ImageItem = ({ imageSrc, onZoom, onRequestClose, onLongPress, delayLongPress, swipeToCloseEnabled = true, doubleTapToZoomEnabled = true, }) => {
+const ImageItem = ({ imageSrc, onZoom, onRequestClose, onLongPress, onPress, delayLongPress, swipeToCloseEnabled = true, doubleTapToZoomEnabled = true, }) => {
     const imageContainer = useRef(null);
     const imageDimensions = useImageDimensions(imageSrc);
     const [translate, scale] = getImageTransform(imageDimensions, SCREEN);
@@ -35,12 +35,18 @@ const ImageItem = ({ imageSrc, onZoom, onRequestClose, onLongPress, delayLongPre
     const onLongPressHandler = useCallback(() => {
         onLongPress(imageSrc);
     }, [imageSrc, onLongPress]);
+    const onPressHandler = useCallback(() => {
+        if (onPress) {
+            onPress(imageSrc);
+        }
+    }, [imageSrc, onPress]);
     const [panHandlers, scaleValue, translateValue] = usePanResponder({
         initialScale: scale || 1,
         initialTranslate: translate || { x: 0, y: 0 },
         onZoom: onZoomPerformed,
         doubleTapToZoomEnabled,
         onLongPress: onLongPressHandler,
+        onPress: onPressHandler,
         delayLongPress,
     });
     const imagesStyles = getImageStyles(imageDimensions, translateValue, scaleValue);

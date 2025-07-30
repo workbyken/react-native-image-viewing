@@ -52,7 +52,7 @@ const isVideoSource = (source) => {
     return false;
 };
 
-function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClose, onLongPress = () => { }, onImageIndexChange, animationType = DEFAULT_ANIMATION_TYPE, backgroundColor = DEFAULT_BG_COLOR, presentationStyle, swipeToCloseEnabled, doubleTapToZoomEnabled, delayLongPress = DEFAULT_DELAY_LONG_PRESS, HeaderComponent, FooterComponent }) {
+function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClose, onLongPress = () => { }, onPress, onImageIndexChange, animationType = DEFAULT_ANIMATION_TYPE, backgroundColor = DEFAULT_BG_COLOR, presentationStyle, swipeToCloseEnabled, doubleTapToZoomEnabled, delayLongPress = DEFAULT_DELAY_LONG_PRESS, HeaderComponent, FooterComponent }) {
     const imageList = useRef(null);
     const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
     const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, SCREEN);
@@ -133,6 +133,7 @@ function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClos
                                     imageSrc={mediaSrc} 
                                     onRequestClose={onRequestCloseEnhanced} 
                                     onLongPress={onLongPress} 
+                                    onPress={onPress}
                                     delayLongPress={delayLongPress} 
                                     swipeToCloseEnabled={swipeToCloseEnabled} 
                                     doubleTapToZoomEnabled={doubleTapToZoomEnabled}
