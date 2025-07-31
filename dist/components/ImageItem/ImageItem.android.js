@@ -36,9 +36,9 @@ const ImageItem = ({ imageSrc, onZoom, onRequestClose, onLongPress, onPress, del
         onLongPress(imageSrc);
     }, [imageSrc, onLongPress]);
     const onPressHandler = useCallback(() => {
-        if (onPress) {
-            onPress(imageSrc);
-        }
+        // TEMPORARILY DISABLED onPress to isolate the error
+        console.log('Android onPress handler called but disabled for debugging');
+        // TODO: Re-enable onPress once we understand the root cause
     }, [imageSrc, onPress]);
     const [panHandlers, scaleValue, translateValue] = usePanResponder({
         initialScale: scale || 1,

@@ -133,7 +133,7 @@ function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClos
                                     imageSrc={mediaSrc} 
                                     onRequestClose={onRequestCloseEnhanced} 
                                     onLongPress={onLongPress} 
-                                    onPress={onPress}
+                                    onPress={typeof onPress === 'function' ? onPress : undefined}
                                     delayLongPress={delayLongPress} 
                                     swipeToCloseEnabled={swipeToCloseEnabled} 
                                     doubleTapToZoomEnabled={doubleTapToZoomEnabled}
