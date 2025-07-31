@@ -9,7 +9,6 @@ import React, { useCallback, useState, useEffect } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { ImageLoading } from "../ImageItem/ImageLoading";
-import useVideoDimensions from "../../hooks/useVideoDimensions";
 
 const SCREEN = Dimensions.get("screen");
 const SCREEN_WIDTH = SCREEN.width;
@@ -17,43 +16,61 @@ const SCREEN_HEIGHT = SCREEN.height;
 
 const VideoItem = ({ videoSrc, onRequestClose, isActive }) => {
   const [loaded, setLoaded] = useState(false);
-  const videoDimensions = useVideoDimensions(videoSrc);
   
-  // Create video player using the new expo-video API
-  const player = useVideoPlayer(videoSrc, (player) => {
+  console.log('VideoItem rendered with videoSrc:', videoSrc);
+  
+  // Extract URI from video source object - expo-video supports both string and object with uri
+  const videoSource = typeof videoSrc === 'string' ? videoSrc : videoSrc.uri;
+  console.log('Using video source:', videoSource);
+  
+  // Create video player using the new expo-video API following docs pattern
+  const player = useVideoPlayer(videoSource, (player) => {
+    console.log('Video player created and configured');
     player.loop = false;
     player.muted = false;
   });
 
-  const onLoadEnd = useCallback(() => {
-    setLoaded(true);
+  // Fallback timeout to hide loading spinner if video doesn't load
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      console.log('Video loading timeout, showing video anyway');
+      setLoaded(true);
+    }, 2000); // 2 second timeout
+
+    return () => clearTimeout(timeout);
   }, []);
 
   // Effect to pause video when component becomes inactive (swiped away)
   useEffect(() => {
-    if (player) {
-      if (!isActive) {
-        player.pause();
-      }
+    if (player && !isActive) {
+      console.log('Pausing video - component inactive');
+      player.pause();
     }
   }, [isActive, player]);
 
   return (
     <View style={styles.container}>
-      {!loaded && <ImageLoading />}
       <VideoView
+        style={styles.video}
         player={player}
-        style={[styles.video, { width: videoDimensions.width, height: videoDimensions.height }]}
+        allowsFullscreen
+        allowsPictureInPicture
+        nativeControls
         contentFit="contain"
-        nativeControls={true}
-        allowsFullscreen={true}
-        allowsPictureInPicture={true}
-        onFirstFrameRender={onLoadEnd}
+        onLoad={() => {
+          console.log('VideoView onLoad triggered');
+          setLoaded(true);
+        }}
         onError={(error) => {
-          console.error("Error loading video:", error);
-          setLoaded(true); // Set loaded to true even on error to hide loading indicator
+          console.error('VideoView error:', error);
+          setLoaded(true);
         }}
       />
+      {!loaded && (
+        <View style={styles.loadingContainer}>
+          <ImageLoading />
+        </View>
+      )}
     </View>
   );
 };
@@ -62,13 +79,24 @@ const styles = StyleSheet.create({
   container: {
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
+    backgroundColor: "black",
     justifyContent: "center",
     alignItems: "center",
   },
   video: {
     width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+    height: SCREEN_HEIGHT * 0.7, // 70% of screen height
+  },
+  loadingContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
   },
 });
 
-export default React.memo(VideoItem); 
+export default React.memo(VideoItem);
