@@ -50,10 +50,9 @@ const VideoItem = ({ videoSrc, onRequestClose, isActive }) => {
 
   // Effect to pause video when component becomes inactive (swiped away)
   useEffect(() => {
-    if (player) {
-      if (!isActive) {
-        player.pause();
-      }
+    if (player && !isActive) {
+      console.log('Video became inactive, pausing playback');
+      player.pause();
     }
   }, [isActive, player]);
 
@@ -66,6 +65,10 @@ const VideoItem = ({ videoSrc, onRequestClose, isActive }) => {
         allowsPictureInPicture
         nativeControls
         contentFit="contain"
+        onFirstFrameRender={() => {
+          console.log('Video first frame rendered');
+          setLoaded(true);
+        }}
         onLoad={() => {
           console.log('VideoView onLoad triggered');
           setLoaded(true);
@@ -95,6 +98,8 @@ const styles = StyleSheet.create({
   video: {
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT * 0.7, // 70% of screen height
+    // Ensure video can receive touch events for controls
+    pointerEvents: 'auto',
   },
   loadingContainer: {
     position: "absolute",
